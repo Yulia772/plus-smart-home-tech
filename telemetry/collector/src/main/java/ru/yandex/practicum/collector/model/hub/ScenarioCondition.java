@@ -6,7 +6,9 @@ import lombok.ToString;
 import ru.yandex.practicum.collector.model.hub.enums.ConditionOperation;
 import ru.yandex.practicum.collector.model.hub.enums.ConditionType;
 
-@Getter @Setter @ToString
+@Getter
+@Setter
+@ToString
 public class ScenarioCondition {
     private String sensorId;
     private ConditionType type;

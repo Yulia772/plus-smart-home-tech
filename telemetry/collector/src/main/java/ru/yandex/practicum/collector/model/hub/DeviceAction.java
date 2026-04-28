@@ -5,7 +5,9 @@ import lombok.Setter;
 import lombok.ToString;
 import ru.yandex.practicum.collector.model.hub.enums.ActionType;
 
-@Getter @Setter @ToString
+@Getter
+@Setter
+@ToString
 public class DeviceAction {
     private String sensorId;
     private ActionType type;

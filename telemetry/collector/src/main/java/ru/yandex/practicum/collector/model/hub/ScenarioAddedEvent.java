@@ -10,7 +10,9 @@ import ru.yandex.practicum.collector.model.hub.enums.HubEventType;
 
 import java.util.List;
 
-@Getter @Setter @ToString(callSuper = true)
+@Getter
+@Setter
+@ToString(callSuper = true)
 public class ScenarioAddedEvent extends HubEvent {
 
     @NotBlank

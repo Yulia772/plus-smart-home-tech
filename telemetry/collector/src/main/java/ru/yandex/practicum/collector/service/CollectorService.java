@@ -7,8 +7,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.collector.mapper.HubEventMapper;
 import ru.yandex.practicum.collector.mapper.SensorEventMapper;
-import ru.yandex.practicum.collector.model.hub.HubEvent;
-import ru.yandex.practicum.collector.model.sensor.SensorEvent;
+import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
+import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 
@@ -27,7 +27,7 @@ public class CollectorService {
     @Value("${collector.kafka.topic.hubs}")
     private String hubTopic;
 
-    public void collectSensorEvent(SensorEvent sensorEvent) {
+    public void collectSensorEvent(SensorEventProto sensorEvent) {
         SensorEventAvro sensorEventAvro = sensorEventMapper.toAvro(sensorEvent);
         kafkaTemplate.send(
                 sensorTopic,
@@ -37,13 +37,13 @@ public class CollectorService {
         log.info("Отправлено событие датчика в Kafka: hubId = {}, id = {}", sensorEvent.getHubId(), sensorEvent.getId());
     }
 
-    public void collectHubEvent(HubEvent hubEvent) {
+    public void collectHubEvent(HubEventProto hubEvent) {
         HubEventAvro hubEventAvro = hubEventMapper.toAvro(hubEvent);
         kafkaTemplate.send(
                 hubTopic,
                 hubEvent.getHubId(),
                 hubEventAvro
         );
-        log.info("Отправлено событие хаба в Kafka: hubId = {}, type = {}", hubEvent.getHubId(), hubEvent.getType());
+        log.info("Отправлено событие хаба в Kafka: hubId = {}, type = {}", hubEvent.getHubId(), hubEvent.getPayloadCase());
     }
 }

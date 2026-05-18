@@ -1,4 +1,4 @@
-package ru.yandex.practicum.aggregator.serialization;
+package telemetry.serialization;
 
 import org.apache.avro.Schema;
 import org.apache.avro.io.BinaryDecoder;

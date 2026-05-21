@@ -41,8 +41,8 @@ public class SensorEventService {
         }
         Sensor sensor = sensorOptional.get();
 
-        scenarioConditionRepository.deleteAllBySensor_Id(sensor.getId());
-        scenarioActionRepository.deleteAllBySensor_Id(sensor.getId());
+        scenarioConditionRepository.deleteAllBySensorId(sensor.getId());
+        scenarioActionRepository.deleteAllBySensorId(sensor.getId());
         sensorRepository.delete(sensor);
 
         log.info("Датчик с id = {}, hubId = {} удален", sensor.getId(), hubId);

@@ -6,12 +6,14 @@ import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.analyzer.mapper.HubRouterMapper;
 import ru.yandex.practicum.analyzer.model.Action;
+import ru.yandex.practicum.analyzer.model.ScenarioAction;
 import ru.yandex.practicum.analyzer.model.Sensor;
 import ru.yandex.practicum.grpc.telemetry.event.DeviceActionProto;
 import ru.yandex.practicum.grpc.telemetry.event.DeviceActionRequest;
 import ru.yandex.practicum.grpc.telemetry.hubrouter.HubRouterControllerGrpc;
 
 import java.time.Instant;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -34,4 +36,14 @@ public class HubRouterClientImpl implements HubRouterClient {
         log.info("Действие отправлено в HubRouter: hubId={}, scenarioName={}, sensorId={}",
                 hubId, scenarioName, sensorId);
     }
+
+    @Override
+    public void sendActions(String hubId, String scenarioName, List<ScenarioAction> scenarioActions) {
+        for (ScenarioAction scenarioAction : scenarioActions) {
+            sendAction(hubId,
+                    scenarioName,
+                    scenarioAction.getSensor(),
+                    scenarioAction.getAction());
+        }
+}
 }

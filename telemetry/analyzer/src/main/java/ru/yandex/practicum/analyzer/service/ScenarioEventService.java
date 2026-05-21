@@ -11,11 +11,7 @@ import ru.yandex.practicum.kafka.telemetry.event.ScenarioAddedEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.ScenarioConditionAvro;
 import ru.yandex.practicum.kafka.telemetry.event.ScenarioRemovedEventAvro;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -78,8 +74,8 @@ public class ScenarioEventService {
 
         Long scenarioId = scenario.getId();
 
-        scenarioConditionRepository.deleteAllByScenario_Id(scenarioId);
-        scenarioActionRepository.deleteAllByScenario_Id(scenarioId);
+        scenarioConditionRepository.deleteAllByScenarioId(scenarioId);
+        scenarioActionRepository.deleteAllByScenarioId(scenarioId);
         scenarioRepository.delete(scenario);
 
         log.info("Сценарий с name = {}, hubId = {} удален", event.getName(), hubId);
@@ -105,12 +101,19 @@ public class ScenarioEventService {
             List<ScenarioConditionAvro> conditions,
             Map<String, Sensor> sensorMap
     ) {
-        for (ScenarioConditionAvro condition : conditions) {
-            String sensorId = condition.getSensorId();
-            Sensor sensor = sensorMap.get(sensorId);
+        List<Condition> savedConditions = conditionRepository.saveAll(
+                conditions.stream()
+                        .map(scenarioMapper::toCondition)
+                        .toList()
+        );
+        List<ScenarioCondition> scenarioConditions = new ArrayList<>();
 
-            Condition jpaCondition = scenarioMapper.toCondition(condition);
-            Condition savedCondition = conditionRepository.save(jpaCondition);
+        for (int i = 0; i < conditions.size(); i++) {
+            ScenarioConditionAvro conditionAvro = conditions.get(i);
+            Condition savedCondition = savedConditions.get(i);
+
+            String sensorId = conditionAvro.getSensorId();
+            Sensor sensor = sensorMap.get(sensorId);
 
             ScenarioCondition scenarioCondition = ScenarioCondition.builder()
                     .id(new ScenarioConditionId(
@@ -122,8 +125,9 @@ public class ScenarioEventService {
                     .sensor(sensor)
                     .condition(savedCondition)
                     .build();
-            scenarioConditionRepository.save(scenarioCondition);
+            scenarioConditions.add(scenarioCondition);
         }
+        scenarioConditionRepository.saveAll(scenarioConditions);
     }
 
     private void saveActions(
@@ -131,12 +135,20 @@ public class ScenarioEventService {
             List<DeviceActionAvro> actions,
             Map<String, Sensor> sensorMap
     ) {
-        for (DeviceActionAvro action : actions) {
-            String sensorId = action.getSensorId();
-            Sensor sensor = sensorMap.get(sensorId);
+        List<Action> savedActions = actionRepository.saveAll(
+                actions.stream()
+                        .map(scenarioMapper::toAction)
+                        .toList()
+        );
 
-            Action jpaAction = scenarioMapper.toAction(action);
-            Action savedAction = actionRepository.save(jpaAction);
+        List<ScenarioAction> scenarioActions = new ArrayList<>();
+
+        for (int i = 0; i < actions.size(); i++) {
+            DeviceActionAvro actionAvro = actions.get(i);
+            Action savedAction = savedActions.get(i);
+
+            String sensorId = actionAvro.getSensorId();
+            Sensor sensor = sensorMap.get(sensorId);
 
             ScenarioAction scenarioAction = ScenarioAction.builder()
                     .id(new ScenarioActionId(
@@ -148,8 +160,9 @@ public class ScenarioEventService {
                     .sensor(sensor)
                     .action(savedAction)
                     .build();
-            scenarioActionRepository.save(scenarioAction);
+            scenarioActions.add(scenarioAction);
         }
+        scenarioActionRepository.saveAll(scenarioActions);
     }
 }
 

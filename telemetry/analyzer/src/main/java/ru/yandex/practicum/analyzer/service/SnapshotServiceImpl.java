@@ -41,12 +41,12 @@ public class SnapshotServiceImpl implements SnapshotService {
                 .toList();
 
         List<ScenarioCondition> conditions =
-                scenarioConditionRepository.findByScenario_IdIn(scenarioIds);
+                scenarioConditionRepository.findByScenarioIdIn(scenarioIds);
         Map<Long, List<ScenarioCondition>> conditionsByScenarioId = conditions.stream()
                 .collect(Collectors.groupingBy(sc -> sc.getScenario().getId()));
 
         List<ScenarioAction> actions =
-                scenarioActionRepository.findByScenario_IdIn(scenarioIds);
+                scenarioActionRepository.findByScenarioIdIn(scenarioIds);
         Map<Long, List<ScenarioAction>> actionsByScenarioId = actions.stream()
                 .collect(Collectors.groupingBy(sa -> sa.getScenario().getId()));
 
@@ -71,11 +71,7 @@ public class SnapshotServiceImpl implements SnapshotService {
             if (matched) {
                 log.info("Сценарий {} для hubId={} выполнился", scenario.getName(), hubId);
 
-                for (ScenarioAction scenarioAction : scenarioActions) {
-                    Action action = scenarioAction.getAction();
-                    Sensor sensor = scenarioAction.getSensor();
-                    hubRouterClient.sendAction(hubId, scenario.getName(), sensor, action);
-                }
+                hubRouterClient.sendActions(hubId, scenario.getName(), scenarioActions);
             }
         }
     }

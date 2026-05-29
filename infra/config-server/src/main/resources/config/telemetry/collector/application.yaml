@@ -1,0 +1,28 @@
+server:
+  port: 8080
+
+grpc:
+  server:
+    port: 59091
+
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: telemetry.serialization.AvroSerializer
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
+
+collector:
+  kafka:
+    topic:
+      sensors: telemetry.sensors.v1
+      hubs: telemetry.hubs.v1

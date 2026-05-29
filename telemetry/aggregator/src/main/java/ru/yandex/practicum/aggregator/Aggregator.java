@@ -11,7 +11,6 @@ import ru.yandex.practicum.aggregator.service.AggregationStarter;
  */
 @SpringBootApplication
 @ConfigurationPropertiesScan
-
 public class Aggregator {
 
     public static void main(String[] args) {

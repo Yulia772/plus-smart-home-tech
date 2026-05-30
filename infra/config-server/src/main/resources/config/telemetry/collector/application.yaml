@@ -12,6 +12,9 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: telemetry.serialization.AvroSerializer
 
+  application:
+    name: collector
+
 management:
   endpoints:
     web:
@@ -26,3 +29,8 @@ collector:
     topic:
       sensors: telemetry.sensors.v1
       hubs: telemetry.hubs.v1
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/

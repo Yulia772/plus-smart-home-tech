@@ -52,5 +52,24 @@ services:
       retries: 10
     restart: unless-stopped
 
+  commerce-db:
+    image: postgres:16.1
+    container_name: commerce-db
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_PASSWORD=commerce
+      - POSTGRES_USER=commerce
+      - POSTGRES_DB=commerce
+    volumes:
+      - commerce-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+    restart: unless-stopped
+
 volumes:
   analyzer-db-data:
+  commerce-db-data:

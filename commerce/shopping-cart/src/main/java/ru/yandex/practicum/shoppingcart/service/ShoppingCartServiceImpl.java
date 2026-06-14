@@ -127,6 +127,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         return shoppingCartRepository.findByUsernameAndActiveTrue(username)
                 .orElseGet(() -> createNewCart(username));
     }
+
     private ShoppingCart createNewCart(String username) {
         ShoppingCart shoppingCart = new ShoppingCart();
         shoppingCart.setShoppingCartId(UUID.randomUUID());
@@ -134,6 +135,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         shoppingCart.setActive(true);
         return shoppingCartRepository.save(shoppingCart);
     }
+
     private ShoppingCart getActiveCart(String username) {
         return shoppingCartRepository.findByUsernameAndActiveTrue(username)
                 .orElseThrow(() -> new NotFoundException("Корзина не найдена"));

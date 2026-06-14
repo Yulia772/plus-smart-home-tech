@@ -61,6 +61,10 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
     @Override
     public Boolean removeProductFromStore(UUID productId) {
         Product foundProduct = getProductOrThrow(productId);
+
+        if (foundProduct.getProductState() == ProductState.DEACTIVATE) {
+            return false;
+        }
         foundProduct.setProductState(ProductState.DEACTIVATE);
         productRepository.save(foundProduct);
         return true;

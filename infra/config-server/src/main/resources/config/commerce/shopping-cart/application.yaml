@@ -25,3 +25,10 @@ spring:
   sql:
     init:
       mode: always
+
+eureka:
+  instance:
+    prefer-ip-address: true
+    ip-address: ${EUREKA_INSTANCE_IP_ADDRESS:127.0.0.1}
+    instance-id: "${spring.application.name}:${random.value}"
+    lease-renewal-interval-in-seconds: 10

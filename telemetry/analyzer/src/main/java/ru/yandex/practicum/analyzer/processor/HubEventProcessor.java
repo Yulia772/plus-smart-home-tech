@@ -8,8 +8,8 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.analyzer.config.KafkaConfig;
 import ru.yandex.practicum.analyzer.serialization.HubEventDeserializer;
 import ru.yandex.practicum.analyzer.service.HubEventService;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
@@ -23,26 +23,20 @@ import java.util.Properties;
 @RequiredArgsConstructor
 public class HubEventProcessor implements Runnable {
 
-    @Value("${analyzer.kafka.bootstrap-servers}")
-    private String bootstrapServers;
-
-    @Value("${analyzer.kafka.consumer.hub-group-id}")
-    private String hubGroupId;
-
-    @Value("${analyzer.kafka.topic.hubs}")
-    private String hubTopic;
-
     private final HubEventService hubEventService;
+    private final KafkaConfig kafkaConfig;
 
     private static final Duration CONSUME_ATTEMPT_TIMEOUT = Duration.ofMillis(1000);
 
     @Override
     public void run() {
         KafkaConsumer<String, HubEventAvro> consumer = new KafkaConsumer<>(getConsumerProperties());
+        String hubTopic = kafkaConfig.getTopic().getHubs();
 
         Runtime.getRuntime().addShutdownHook(new Thread(consumer::wakeup));
         try {
             consumer.subscribe(List.of(hubTopic));
+            log.info("Analyzer подписался на топик событий хаба: {}", hubTopic);
 
             while (true) {
                 ConsumerRecords<String, HubEventAvro> records =
@@ -67,8 +61,8 @@ public class HubEventProcessor implements Runnable {
 
     private Properties getConsumerProperties() {
         Properties properties = new Properties();
-        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        properties.put(ConsumerConfig.GROUP_ID_CONFIG, hubGroupId);
+        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaConfig.getBootstrapServers());
+        properties.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaConfig.getConsumer().getHubGroupId());
 
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
                 StringDeserializer.class.getName());

@@ -9,8 +9,8 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.aggregator.config.KafkaConfig;
 import ru.yandex.practicum.aggregator.serialization.SensorEventDeserializer;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
@@ -27,23 +27,10 @@ import java.util.Properties;
 @Component
 @RequiredArgsConstructor
 public class AggregationStarter {
-
-    // ... объявление полей и конструктора ...
-    @Value("${aggregator.kafka.bootstrap-servers}")
-    private String bootstrapServers;
-
-    @Value("${aggregator.kafka.topic.sensors}")
-    private String sensorTopic;
-
-    @Value("${aggregator.kafka.topic.snapshots}")
-    private String snapshotsTopic;
-
-    @Value("${aggregator.kafka.consumer.group-id}")
-    private String groupId;
-
     private static final Duration CONSUME_ATTEMPT_TIMEOUT = Duration.ofMillis(1000);
 
     private final SnapshotService snapshotService;
+    private final KafkaConfig kafkaConfig;
 
     public void start() {
 
@@ -51,8 +38,13 @@ public class AggregationStarter {
         KafkaProducer<String, SensorsSnapshotAvro> producer = new KafkaProducer<>(getProducerProperties());
 
         Runtime.getRuntime().addShutdownHook(new Thread(consumer::wakeup));
+
         try {
+            String sensorTopic = kafkaConfig.getTopic().getSensors();
+            String snapshotsTopic = kafkaConfig.getTopic().getSnapshots();
+
             consumer.subscribe(List.of(sensorTopic));
+            log.info("Aggregator подписался на topic: {}", sensorTopic);
 
             while (true) {
                 ConsumerRecords<String, SensorEventAvro> records =
@@ -97,8 +89,8 @@ public class AggregationStarter {
 
     private Properties getConsumerProperties() {
         Properties properties = new Properties();
-        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        properties.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaConfig.getBootstrapServers());
+        properties.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaConfig.getConsumer().getGroupId());
 
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
                 StringDeserializer.class.getName());
@@ -115,7 +107,7 @@ public class AggregationStarter {
     private Properties getProducerProperties() {
         Properties properties = new Properties();
 
-        properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaConfig.getBootstrapServers());
 
         properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
                 StringSerializer.class.getName());

@@ -1,12 +1,12 @@
 package ru.yandex.practicum.interactionapi.warehouse.api;
 
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.interactionapi.cart.ShoppingCartDto;
 import ru.yandex.practicum.interactionapi.warehouse.*;
+
+import java.util.Map;
+import java.util.UUID;
 
 public interface WarehouseApi {
 
@@ -21,4 +21,13 @@ public interface WarehouseApi {
 
     @PutMapping("/api/v1/warehouse")
     void newProductInWarehouse(@Valid @RequestBody NewProductInWarehouseRequest request);
+
+    @PostMapping("/api/v1/warehouse/assembly")
+    BookedProductsDto assemblyProductsForOrder(@Valid @RequestBody AssemblyProductsForOrderRequest request);
+
+    @PostMapping("/api/v1/warehouse/shipped")
+    void shippedToDelivery(@Valid @RequestBody ShippedToDeliveryRequest request);
+
+    @PostMapping("/api/v1/warehouse/return")
+    void acceptReturn(@RequestBody Map<UUID, Long> products);
 }

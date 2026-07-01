@@ -5,7 +5,7 @@ import ru.yandex.practicum.interactionapi.delivery.api.DeliveryApi;
 
 @FeignClient(
         name = "delivery",
-        configuration = DeliveryClientConfig.class
+        configuration = FeignClientConfig.class
 )
 public interface DeliveryClient extends DeliveryApi {
 }

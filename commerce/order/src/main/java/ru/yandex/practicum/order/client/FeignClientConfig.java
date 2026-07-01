@@ -2,11 +2,13 @@ package ru.yandex.practicum.order.client;
 
 import feign.codec.ErrorDecoder;
 import org.springframework.context.annotation.Bean;
+import ru.yandex.practicum.interactionapi.client.CommonFeignErrorDecoder;
 
-public class WarehouseClientConfig {
+public class FeignClientConfig {
 
     @Bean
     public ErrorDecoder errorDecoder() {
-        return new WarehouseErrorDecoder();
+        return new CommonFeignErrorDecoder();
     }
 }
+

@@ -5,7 +5,7 @@ import ru.yandex.practicum.interactionapi.payment.api.PaymentApi;
 
 @FeignClient(
         name = "payment",
-        configuration = PaymentClientConfig.class
+        configuration = FeignClientConfig.class
 )
 public interface PaymentClient extends PaymentApi {
 }

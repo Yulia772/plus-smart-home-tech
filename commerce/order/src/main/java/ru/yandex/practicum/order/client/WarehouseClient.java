@@ -5,7 +5,7 @@ import ru.yandex.practicum.interactionapi.warehouse.api.WarehouseApi;
 
 @FeignClient(
         name = "warehouse",
-        configuration = WarehouseClientConfig.class
+        configuration = FeignClientConfig.class
 )
 public interface WarehouseClient extends WarehouseApi {
 }

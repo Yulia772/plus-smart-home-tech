@@ -5,7 +5,7 @@ import ru.yandex.practicum.interactionapi.order.api.OrderApi;
 
 @FeignClient(
         name = "order",
-        configuration = OrderClientConfig.class
+        configuration = FeignClientConfig.class
 )
 public interface OrderClient extends OrderApi {
 }

@@ -5,7 +5,7 @@ import ru.yandex.practicum.interactionapi.store.api.ShoppingStoreApi;
 
 @FeignClient(
         name = "shopping-store",
-        configuration = ShoppingStoreClientConfig.class
+        configuration = FeignClientConfig.class
 )
 public interface ShoppingStoreClient extends ShoppingStoreApi {
 }

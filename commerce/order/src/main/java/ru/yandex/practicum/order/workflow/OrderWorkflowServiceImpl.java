@@ -9,15 +9,14 @@ import ru.yandex.practicum.interactionapi.delivery.DeliveryState;
 import ru.yandex.practicum.interactionapi.order.OrderDto;
 import ru.yandex.practicum.interactionapi.order.OrderState;
 import ru.yandex.practicum.interactionapi.order.ProductReturnRequest;
+import ru.yandex.practicum.interactionapi.exception.BadRequestException;
 import ru.yandex.practicum.interactionapi.payment.PaymentDto;
 import ru.yandex.practicum.interactionapi.warehouse.AddressDto;
 import ru.yandex.practicum.interactionapi.warehouse.AssemblyProductsForOrderRequest;
 import ru.yandex.practicum.interactionapi.warehouse.BookedProductsDto;
-import ru.yandex.practicum.interactionapi.warehouse.ShippedToDeliveryRequest;
 import ru.yandex.practicum.order.client.DeliveryClient;
 import ru.yandex.practicum.order.client.PaymentClient;
 import ru.yandex.practicum.order.client.WarehouseClient;
-import ru.yandex.practicum.order.exception.BadRequestException;
 import ru.yandex.practicum.order.mapper.AddressMapper;
 import ru.yandex.practicum.order.mapper.OrderMapper;
 import ru.yandex.practicum.order.model.OrderEntity;
@@ -121,7 +120,6 @@ public class OrderWorkflowServiceImpl implements OrderWorkflowService {
             throw new BadRequestException("Успешная оплата невозможна для заказа в текущем статусе");
         }
 
-        paymentClient.paymentSuccess(order.getPaymentId());
         order.setState(OrderState.PAID);
 
         OrderEntity savedOrder = orderService.save(order);
@@ -141,7 +139,6 @@ public class OrderWorkflowServiceImpl implements OrderWorkflowService {
             throw new BadRequestException("Ошибка оплаты невозможна для заказа в текущем статусе");
         }
 
-        paymentClient.paymentFailed(order.getPaymentId());
         order.setState(OrderState.PAYMENT_FAILED);
 
         OrderEntity savedOrder = orderService.save(order);
@@ -162,13 +159,6 @@ public class OrderWorkflowServiceImpl implements OrderWorkflowService {
             throw new BadRequestException("Заказ еще не оплачен");
         }
 
-        ShippedToDeliveryRequest request = new ShippedToDeliveryRequest();
-        request.setOrderId(orderId);
-        request.setDeliveryId(order.getDeliveryId());
-
-        warehouseClient.shippedToDelivery(request);
-        deliveryClient.deliveryPicked(orderId);
-
         order.setState(OrderState.ON_DELIVERY);
 
         OrderEntity savedOrder = orderService.save(order);
@@ -187,7 +177,6 @@ public class OrderWorkflowServiceImpl implements OrderWorkflowService {
         if (order.getState() != OrderState.ON_DELIVERY) {
             throw new BadRequestException("Ошибка доставки заказа невозможна для заказа в текущем статусе");
         }
-        deliveryClient.deliveryFailed(orderId);
         order.setState(OrderState.DELIVERY_FAILED);
 
         OrderEntity savedOrder = orderService.save(order);
@@ -203,7 +192,6 @@ public class OrderWorkflowServiceImpl implements OrderWorkflowService {
         if (order.getState() != OrderState.ON_DELIVERY) {
             throw new BadRequestException("Заказ еще не находится в доставке");
         }
-        deliveryClient.deliverySuccessful(orderId);
         order.setState(OrderState.COMPLETED);
 
         OrderEntity savedOrder = orderService.save(order);

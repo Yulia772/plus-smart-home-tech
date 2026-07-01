@@ -1,14 +1,14 @@
 package ru.yandex.practicum.shoppingstore.service;
 
-import jakarta.ws.rs.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.interactionapi.exception.BadRequestException;
+import ru.yandex.practicum.interactionapi.exception.NotFoundException;
 import ru.yandex.practicum.interactionapi.store.*;
-import ru.yandex.practicum.shoppingstore.exception.ProductNotFoundException;
-import ru.yandex.practicum.shoppingstore.exception.ProductValidationException;
+
 import ru.yandex.practicum.shoppingstore.mapper.ProductMapper;
 import ru.yandex.practicum.shoppingstore.model.Product;
 import ru.yandex.practicum.shoppingstore.repository.ProductRepository;
@@ -50,7 +50,7 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
         UUID productId = productDto.getProductId();
         if (productId == null) {
             log.warn("Невозможно обновить продукт без id: product={}", productDto);
-            throw new ProductValidationException("Невозможно обновить продукт без id");
+            throw new BadRequestException("Невозможно обновить продукт без id");
         }
         getProductOrThrow(productId);
         Product product = productMapper.toProduct(productDto);
@@ -94,7 +94,7 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
         return productRepository.findById(productId)
                         .orElseThrow(() -> {
                             log.warn("Продукт с id={} не найден", productId);
-                            return new ProductNotFoundException("Продукт с id=" + productId + " не найден");
+                            return new NotFoundException("Продукт с id=" + productId + " не найден");
                         });
     }
 }

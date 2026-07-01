@@ -1,4 +1,4 @@
-package ru.yandex.practicum.order.exception;
+package ru.yandex.practicum.interactionapi.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

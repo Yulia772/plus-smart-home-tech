@@ -3,7 +3,7 @@ package ru.yandex.practicum.shoppingcart.client;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.interactionapi.cart.ShoppingCartDto;
 import ru.yandex.practicum.interactionapi.warehouse.*;
-import ru.yandex.practicum.shoppingcart.exception.BadRequestException;
+import ru.yandex.practicum.interactionapi.exception.BadRequestException;
 
 import java.util.Map;
 import java.util.UUID;

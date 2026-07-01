@@ -9,47 +9,46 @@ import ru.yandex.practicum.interactionapi.order.ProductReturnRequest;
 import java.util.List;
 import java.util.UUID;
 
-@RequestMapping("/api/v1/order")
 public interface OrderApi {
 
-    @GetMapping
+    @GetMapping("/api/v1/order")
     List<OrderDto> getClientOrders(@RequestParam("username") String username,
                                    @RequestParam(required = false, defaultValue = "0") int page,
                                    @RequestParam(required = false, defaultValue = "20") int size);
 
-    @PutMapping
+    @PutMapping("/api/v1/order")
     OrderDto createNewOrder(@RequestBody @Valid CreateNewOrderRequest orderRequest);
 
-    @PostMapping("/return")
+    @PostMapping("/api/v1/order/return")
     OrderDto productReturn(@RequestBody @Valid ProductReturnRequest request);
 
-    @PostMapping("/payment")
+    @PostMapping("/api/v1/order/payment")
     OrderDto payment(@RequestBody UUID orderId);
 
-    @PostMapping("/payment/successful")
+    @PostMapping("/api/v1/order/payment/successful")
     OrderDto paymentSuccessful(@RequestBody UUID orderId);
 
-    @PostMapping("/payment/failed")
+    @PostMapping("/api/v1/order/payment/failed")
     OrderDto paymentFailed(@RequestBody UUID orderId);
 
-    @PostMapping("/delivery")
+    @PostMapping("/api/v1/order/delivery")
     OrderDto delivery(@RequestBody UUID orderId);
 
-    @PostMapping("/delivery/failed")
+    @PostMapping("/api/v1/order/delivery/failed")
     OrderDto deliveryFailed(@RequestBody UUID orderId);
 
-    @PostMapping("/completed")
+    @PostMapping("/api/v1/order/completed")
     OrderDto complete(@RequestBody UUID orderId);
 
-    @PostMapping("/calculate/total")
+    @PostMapping("/api/v1/order/calculate/total")
     OrderDto calculateTotalCost(@RequestBody UUID orderId);
 
-    @PostMapping("/calculate/delivery")
+    @PostMapping("/api/v1/order/calculate/delivery")
     OrderDto calculateDeliveryCost(@RequestBody UUID orderId);
 
-    @PostMapping("/assembly")
+    @PostMapping("/api/v1/order/assembly")
     OrderDto assembly(@RequestBody UUID orderId);
 
-    @PostMapping("/assembly/failed")
+    @PostMapping("/api/v1/order/assembly/failed")
     OrderDto assemblyFailed(@RequestBody UUID orderId);
 }

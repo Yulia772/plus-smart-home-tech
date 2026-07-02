@@ -17,8 +17,12 @@ import ru.yandex.practicum.payment.model.PaymentState;
 import ru.yandex.practicum.payment.repository.PaymentRepository;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -131,11 +135,11 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional(readOnly = true)
     public BigDecimal productCost(OrderDto dto) {
         validateOrderDto(dto);
-        if (dto.getProducts() == null || dto.getProducts().isEmpty()) {
+        Map<UUID, Long> products = dto.getProducts();
+
+        if (products == null || products.isEmpty()) {
             throw  new BadRequestException("Переданы неверные данные");
         }
-        Map<UUID, Long> products = dto.getProducts();
-        BigDecimal totalPrice = BigDecimal.ZERO;
         for (Map.Entry<UUID, Long> entry : products.entrySet()) {
             UUID productId = entry.getKey();
             Long quantity = entry.getValue();
@@ -145,12 +149,36 @@ public class PaymentServiceImpl implements PaymentService {
             if (quantity == null || quantity <= 0) {
                 throw new BadRequestException("Количество товара должно быть больше нуля");
             }
-            ProductDto productDto = shoppingStoreClient.getProduct(productId);
+        }
 
-            if (productDto == null || productDto.getPrice() == null) {
-                throw new BadRequestException("Не удалось получить цену товара");
+        Set<UUID> productIds = products.keySet();
+        List<ProductDto> productDtos = shoppingStoreClient.getProductsByIds(productIds);
+
+        if (productDtos == null || productDtos.isEmpty()) {
+            throw new NotFoundException("Товары не найдены");
+        }
+
+        Map<UUID, ProductDto> productsById = productDtos.stream()
+                .collect(Collectors.toMap(ProductDto::getProductId, Function.identity()));
+
+        if (productsById.size() != productIds.size()) {
+            throw new NotFoundException("Один или несколько товаров не найдены");
+        }
+
+        BigDecimal totalPrice = BigDecimal.ZERO;
+
+        for (Map.Entry<UUID, Long> entry : products.entrySet()) {
+            UUID productId = entry.getKey();
+            Long quantity = entry.getValue();
+
+            ProductDto productDto = productsById.get(productId);
+            if (productDto == null) {
+                throw new NotFoundException("Товар не найден");
             }
             BigDecimal price = productDto.getPrice();
+            if (price == null || price.compareTo(BigDecimal.ZERO) <= 0) {
+                throw new BadRequestException("Не удалось получить корректную цену товара");
+            }
             BigDecimal productTotal = price.multiply(BigDecimal.valueOf(quantity));
             totalPrice = totalPrice.add(productTotal);
         }

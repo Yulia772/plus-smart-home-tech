@@ -3,6 +3,8 @@ package ru.yandex.practicum.shoppingstore.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.interactionapi.store.ProductCategory;
 import ru.yandex.practicum.interactionapi.store.ProductDto;
@@ -10,6 +12,8 @@ import ru.yandex.practicum.interactionapi.store.QuantityState;
 import ru.yandex.practicum.interactionapi.store.api.ShoppingStoreApi;
 import ru.yandex.practicum.shoppingstore.service.ShoppingStoreService;
 
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -45,5 +49,10 @@ public class ShoppingStoreController implements ShoppingStoreApi {
     @Override
     public ProductDto getProduct(UUID productId) {
         return shoppingStoreService.getProduct(productId);
+    }
+
+    @Override
+    public List<ProductDto> getProductsByIds(Set<UUID> productIds) {
+        return shoppingStoreService.getProductsByIds(productIds);
     }
 }

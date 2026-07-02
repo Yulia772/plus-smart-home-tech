@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.interactionapi.exception.BadRequestException;
 import ru.yandex.practicum.interactionapi.exception.NotFoundException;
 import ru.yandex.practicum.interactionapi.store.*;
@@ -13,6 +14,8 @@ import ru.yandex.practicum.shoppingstore.mapper.ProductMapper;
 import ru.yandex.practicum.shoppingstore.model.Product;
 import ru.yandex.practicum.shoppingstore.repository.ProductRepository;
 
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Slf4j
@@ -88,6 +91,26 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
     public ProductDto getProduct(UUID productId) {
         Product product = getProductOrThrow(productId);
         return productMapper.toDto(product);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProductDto> getProductsByIds(Set<UUID> productIds) {
+        if (productIds == null || productIds.isEmpty()) {
+            throw new BadRequestException("Переданы неверные данные");
+        }
+        if (productIds.contains(null)) {
+            throw new BadRequestException("Идентификатор товара не может быть пустым");
+        }
+        List<Product> products = productRepository.findAllByProductIdIn(productIds);
+
+        if (products.size() != productIds.size()) {
+            throw new NotFoundException("Один или несколько товаров не найдены");
+        }
+
+        return products.stream()
+                .map(productMapper::toDto)
+                .toList();
     }
 
     private Product getProductOrThrow(UUID productId) {

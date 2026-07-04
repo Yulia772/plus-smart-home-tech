@@ -8,6 +8,8 @@ import ru.yandex.practicum.interactionapi.store.ProductCategory;
 import ru.yandex.practicum.interactionapi.store.ProductDto;
 import ru.yandex.practicum.interactionapi.store.QuantityState;
 
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public interface ShoppingStoreApi {
@@ -23,6 +25,9 @@ public interface ShoppingStoreApi {
 
     @PostMapping("/api/v1/shopping-store/removeProductFromStore")
     Boolean removeProductFromStore(@RequestBody UUID productId);
+
+    @PostMapping("/api/v1/shopping-store/products")
+    List<ProductDto> getProductsByIds(@RequestBody Set<UUID> productIds);
 
     @PostMapping("/api/v1/shopping-store/quantityState")
     Boolean setProductQuantityState(@RequestParam("productId") UUID productId,

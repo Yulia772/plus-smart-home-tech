@@ -6,6 +6,8 @@ import ru.yandex.practicum.interactionapi.store.ProductCategory;
 import ru.yandex.practicum.interactionapi.store.ProductDto;
 import ru.yandex.practicum.interactionapi.store.QuantityState;
 
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public interface ShoppingStoreService {
@@ -16,6 +18,8 @@ public interface ShoppingStoreService {
     ProductDto updateProduct(ProductDto productDto);
 
     Boolean removeProductFromStore(UUID productId);
+
+    List<ProductDto> getProductsByIds(Set<UUID> productIds);
 
     Boolean setProductQuantityState(UUID productId, QuantityState quantityState);
 

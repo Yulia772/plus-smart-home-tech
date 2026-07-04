@@ -2,12 +2,11 @@ package ru.yandex.practicum.shoppingcart.client;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.interactionapi.cart.ShoppingCartDto;
-import ru.yandex.practicum.interactionapi.warehouse.AddProductToWarehouseRequest;
-import ru.yandex.practicum.interactionapi.warehouse.AddressDto;
-import ru.yandex.practicum.interactionapi.warehouse.BookedProductsDto;
-import ru.yandex.practicum.interactionapi.warehouse.NewProductInWarehouseRequest;
-import ru.yandex.practicum.interactionapi.warehouse.api.WarehouseApi;
-import ru.yandex.practicum.shoppingcart.exception.BadRequestException;
+import ru.yandex.practicum.interactionapi.warehouse.*;
+import ru.yandex.practicum.interactionapi.exception.BadRequestException;
+
+import java.util.Map;
+import java.util.UUID;
 
 @Component
 public class WarehouseClientFallback implements WarehouseClient {
@@ -28,6 +27,21 @@ public class WarehouseClientFallback implements WarehouseClient {
 
     @Override
     public void newProductInWarehouse(NewProductInWarehouseRequest request) {
+        throw new BadRequestException("Склад временно недоступен");
+    }
+
+    @Override
+    public BookedProductsDto assemblyProductsForOrder(AssemblyProductsForOrderRequest request) {
+        throw new BadRequestException("Склад временно недоступен");
+    }
+
+    @Override
+    public void shippedToDelivery(ShippedToDeliveryRequest request) {
+        throw new BadRequestException("Склад временно недоступен");
+    }
+
+    @Override
+    public void acceptReturn(Map<UUID, Long> products) {
         throw new BadRequestException("Склад временно недоступен");
     }
 }
